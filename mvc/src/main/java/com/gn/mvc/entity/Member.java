@@ -1,13 +1,22 @@
 package com.gn.mvc.entity;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
@@ -15,6 +24,8 @@ import lombok.Setter;
 @Builder
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Member {
 	
 	@Id
@@ -30,4 +41,17 @@ public class Member {
 	
 	@Column(name="member_name")
 	private String memberName;
+	
+	@CreationTimestamp
+	@Column(updatable=false ,name="reg_date")
+	private LocalDateTime regDate;
+	
+	@UpdateTimestamp
+	@Column(insertable=false ,name="mod_date")
+	private LocalDateTime modDate;
+	
+	@OneToMany(mappedBy="member")
+	private List<Board> boards;
+	
+	
 }

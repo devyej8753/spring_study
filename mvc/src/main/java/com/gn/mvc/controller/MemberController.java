@@ -25,7 +25,7 @@ public class MemberController {
 	}
 	
 	@PostMapping("/member")
-	@ResponseBody
+	@ResponseBody // json 형식으로 받을때 필수
 	public Map<String,String> createMemberApi(
 		MemberDto dto
 	){
@@ -35,7 +35,7 @@ public class MemberController {
 		
 		System.out.println(dto);
 		MemberDto md = service.createMember(dto);
-		if(md != null) {
+		if(md.getMember_no() != null) {
 			resultMap.put("res_code", "200");
 			resultMap.put("res_msg", "회원가입 성공하였습니다.");
 		}

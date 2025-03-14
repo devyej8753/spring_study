@@ -55,10 +55,13 @@ layout:decorate="~{/include/layout}">
 					})
 					.then(response => response.json())
 					.then(data => {
-						console.log(data);
+							alert(data.res_code);
+						if(data.res_code == '200'){
+							location.href="/"
+						}
 					})
 					.catch(error =>{
-						console.log(error);
+						alert(error);
 					})
 				}
 			}) 
