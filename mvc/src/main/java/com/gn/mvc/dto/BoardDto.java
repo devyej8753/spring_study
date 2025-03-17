@@ -3,6 +3,7 @@ package com.gn.mvc.dto;
 import java.time.LocalDateTime;
 
 import com.gn.mvc.entity.Board;
+import com.gn.mvc.entity.Member;
 
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -23,9 +24,10 @@ public class BoardDto {
 	private Long board_no;
 	private String board_title;
 	private String board_content;
+	private Long board_writer;
 	private LocalDateTime reg_date;
 	private LocalDateTime mod_date;
-	
+	 
 	
 	// 1. BoardDto -> Board(Entity)
 	public Board toEntity() {
@@ -33,6 +35,7 @@ public class BoardDto {
 				.boardTitle(board_title)
 				.boardContent(board_content)
 				.boardNo(board_no)
+				.member(Member.builder().memberNo(board_writer).build())
 				.build();
 			
 	}
