@@ -1,6 +1,8 @@
 package com.gn.mvc.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -13,11 +15,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.gn.mvc.dto.AttachDto;
 import com.gn.mvc.dto.BoardDto;
 import com.gn.mvc.dto.PageDto;
 import com.gn.mvc.dto.SearchDto;
+import com.gn.mvc.entity.Attach;
 import com.gn.mvc.entity.Board;
+import com.gn.mvc.service.AttachService;
 import com.gn.mvc.service.BoardService;
 
 import lombok.RequiredArgsConstructor;
@@ -42,7 +48,7 @@ public class BoardController {
 	
 	// 3. 생성자 주입 + final
 	private final BoardService service;
-	
+	private final AttachService attachService;
 //	@Autowired
 //	public BoardController(BoardService service) {
 //		this.service = service;
@@ -65,19 +71,35 @@ public class BoardController {
 	){ 
 		Map<String,String> resultMap = new HashMap<String,String>();
 		resultMap.put("res_code", "500");
-		resultMap.put("res_msg", "게시글 등록중 오류가 발생하였습니다");
-		                                                               
-		System.out.println(dto);
+		resultMap.put("res_msg", "게시글 등록중 오류가 발생했습니다");
+		
+		List<AttachDto> attachDtoList = new ArrayList<AttachDto>();
+		
+		for(MultipartFile mf : dto.getFiles()) {
+			AttachDto attachDto = attachService.uploadFile(mf);
+			if(attachDto != null) attachDtoList.add(attachDto);
+		}
+		if(dto.getFiles().size() == attachDtoList.size()) {
+			int result = service.createBoard(dto,attachDtoList);
+			if(result > 0) {
+				resultMap.put("res_code", "200");
+				resultMap.put("res_msg", "정상적으로 게시물이 등록되었습니다");
+			}
+		}
+		
+		
 		// Service가 가지고 있는 createBoard 메소드 호출
-		BoardDto result = service.createBoard(dto);
+//		BoardDto result = service.createBoard(dto);
+		
+		
 		
 		// 스프링에서 출력문? 위에 로깅 설정해야함
 		// application.properties 에서 logging.level.root=debug 레벨설정
 		// logback-spring.xml 에서도 설정가능함 둘중 하나만 설정해야함
-		logger.debug("1 : "+result.toString());
-		logger.info("2 : "+result.toString());
-		logger.warn("3 : "+result.toString());
-		logger.error("4 : "+result.toString());
+//		logger.debug("1 : "+result.toString());
+//		logger.info("2 : "+result.toString());
+//		logger.warn("3 : "+result.toString());
+//		logger.error("4 : "+result.toString());
 		
 		return resultMap;
 	}
@@ -105,6 +127,8 @@ public class BoardController {
 		logger.info("게시글 단일 조회 : "+id);
 		Board result = service.selectBoardOne(id);
 		model.addAttribute("board",result);
+		List<Attach> attachList = attachService.selectAttachList(id);
+		model.addAttribute("attachList",attachList);
 		return "board/detail";
 	}
 	
@@ -112,6 +136,9 @@ public class BoardController {
 	public String updateBoardView(@PathVariable("id") Long id,Model model) {
 		Board board = service.selectBoardOne(id);
 		model.addAttribute("board",board);
+		
+		List<Attach> attachList = attachService.selectAttachList(id);
+		model.addAttribute("attachList",attachList);
 		return "board/update";
 	}
 	
@@ -124,12 +151,15 @@ public class BoardController {
 		Map<String,String> resultMap = new HashMap<String,String>();
 		resultMap.put("res_code", "500");
 		resultMap.put("res_msg", "게시글 수정중 문제가 발생했습니다.");
+		
+		logger.info("삭제 파일 정보 : "+param.getDelete_files());
+		
 		// 3. 수정 결과 Entity가 null이 아니면 성공 그외에는 실패
-		BoardDto result = service.updateBoard(param);
-		if(result != null) {
-			resultMap.put("res_code", "200");
-			resultMap.put("res_msg","게시글 수정이 정상적으로 완료했습니다.");
-		}
+//		BoardDto result = service.updateBoard(param);
+//		if(result != null) {
+//			resultMap.put("res_code", "200");
+//			resultMap.put("res_msg","게시글 수정이 정상적으로 완료했습니다.");
+//		}
 		return resultMap;
 	}
 	@DeleteMapping("/board/{id}")
