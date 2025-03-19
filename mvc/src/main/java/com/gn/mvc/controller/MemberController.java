@@ -19,12 +19,17 @@ public class MemberController {
 
 	private final MemberService service;
 	
-	@GetMapping("/member/create")
+	@GetMapping("/login")
+	public String loginView() {
+		return "member/login";
+	}
+	
+	@GetMapping("/signup")
 	public String createMemberView() {
 		return "/member/create";
 	}
 	
-	@PostMapping("/member")
+	@PostMapping("/signup")
 	@ResponseBody // json 형식으로 받을때 필수
 	public Map<String,String> createMemberApi(
 		MemberDto dto

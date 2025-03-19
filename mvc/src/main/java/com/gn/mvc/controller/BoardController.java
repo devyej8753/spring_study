@@ -79,12 +79,12 @@ public class BoardController {
 			AttachDto attachDto = attachService.uploadFile(mf);
 			if(attachDto != null) attachDtoList.add(attachDto);
 		}
-		if(dto.getFiles().size() == attachDtoList.size()) {
+//		if(dto.getFiles().size() == attachDtoList.size()) {
 			int result = service.createBoard(dto,attachDtoList);
 			if(result > 0) {
 				resultMap.put("res_code", "200");
 				resultMap.put("res_msg", "정상적으로 게시물이 등록되었습니다");
-			}
+//			}
 		}
 		
 		
@@ -151,17 +151,21 @@ public class BoardController {
 		Map<String,String> resultMap = new HashMap<String,String>();
 		resultMap.put("res_code", "500");
 		resultMap.put("res_msg", "게시글 수정중 문제가 발생했습니다.");
-		
-		logger.info("삭제 파일 정보 : "+param.getDelete_files());
-		
+//		logger.info("삭제 파일 정보 : "+param.getDelete_files());
 		// 3. 수정 결과 Entity가 null이 아니면 성공 그외에는 실패
-//		BoardDto result = service.updateBoard(param);
-//		if(result != null) {
-//			resultMap.put("res_code", "200");
-//			resultMap.put("res_msg","게시글 수정이 정상적으로 완료했습니다.");
-//		}
+		List<AttachDto> attachDtoList = new ArrayList<AttachDto>();
+		for(MultipartFile mf : param.getFiles()) {
+			AttachDto attachDto = attachService.uploadFile(mf);
+			if(attachDto != null) attachDtoList.add(attachDto);
+		}
+		Board result = service.updateBoard(param,attachDtoList);
+		if(result != null) {
+			resultMap.put("res_code", "200");
+			resultMap.put("res_msg","게시글 수정이 정상적으로 완료했습니다.");
+		}
 		return resultMap;
 	}
+	
 	@DeleteMapping("/board/{id}")
 	@ResponseBody
 	public Map<String,String> deleteBoardApi(
